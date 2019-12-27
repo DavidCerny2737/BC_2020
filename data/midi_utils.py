@@ -193,13 +193,14 @@ def piano_roll(file_name):
 
 
 def midi(piano_roll, file_name):
-    piano_roll_joined = None
+    piano_roll_joined = piano_roll
+    '''piano_roll_joined = None
     for pr in piano_roll:
         if piano_roll_joined is None:
             piano_roll_joined = pr
             continue
         else:
-            piano_roll_joined = np.concatenate((piano_roll_joined, pr))
+            piano_roll_joined = np.concatenate((piano_roll_joined, pr))'''
     piano_roll_joined[piano_roll_joined == 1] = 80
     left_missing = np.zeros((piano_roll_joined.shape[0], LOWER_BOUND))
     right_missing = np.zeros((piano_roll_joined.shape[0], MIDI_NOTE_MAX - UPPER_BOUND))

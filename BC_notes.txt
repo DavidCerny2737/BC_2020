@@ -4,6 +4,7 @@ BC - links:
 	pretty midi lbr:	https://github.com/craffel/pretty-midi
 	magenta vrae:		https://nips2017creativity.github.io/doc/Hierarchical_Variational_Autoencoders_for_Music.pdf
 	magenta vrae-code:	https://github.com/tensorflow/magenta
+	varriational recurrent autoenc: https://arxiv.org/pdf/1412.6581.pdf
 BC - notes:
 	neresim time signature a posledni piano roll padduju zezdola nulami (nechci ucit sit aby generovala jenom nuly, co s tim?)
 
