@@ -12,20 +12,18 @@ class Encoder(nn.Module):
         hidden_dim = hidden_size * num_layers * 2
         if bidirectional:
             hidden_dim *= 2
+        self.activation = nn.Tanh()
 
         self.mean_net = nn.Linear(hidden_dim, latent_size)
         self.sigma_net = nn.Linear(hidden_dim, latent_size)
-        self.activation_mean = nn.PReLU()
-        self.activation_logvar = nn.PReLU()
 
     def forward(self, x):
         output, hn = self.rnn(x)
 
         hn = torch.cat((hn[0], hn[1]), 2).transpose(0, 1).contiguous()
         hn = hn.view(hn.shape[0], -1)
+        hn = self.activation(hn)
 
         mean = self.mean_net(hn)
-        mean = self.activation_mean(mean)
         logvar = self.sigma_net(hn)
-        logvar = self.activation_logvar(logvar)
         return mean, logvar

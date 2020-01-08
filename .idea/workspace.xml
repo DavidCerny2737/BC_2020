@@ -2,22 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1f1dbf97-8429-4c35-bb4f-72eb3c02884e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/architecture/torch_play.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/midi_data/game/results/aug_04woodman.mid" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BC_notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/BC_notes.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/architecture/decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/decoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/architecture/encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/encoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/architecture/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/train.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/architecture/vrae.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/vrae.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/midi_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/midi_utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="BC_2020" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -36,7 +34,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../chung-I" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../VariationalRecurrentAutoEncoder" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -184,6 +182,14 @@
       <option name="presentableId" value="Default" />
       <updated>1572087572855</updated>
     </task>
+    <task id="LOCAL-00001" summary="Teď už by to mělo fungovat nevím proč to nejde.">
+      <created>1577461277504</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1577461277504</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -201,6 +207,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Teď už by to mělo fungovat nevím proč to nejde." />
+    <option name="LAST_COMMIT_MESSAGE" value="Teď už by to mělo fungovat nevím proč to nejde." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
