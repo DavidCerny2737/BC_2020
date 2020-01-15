@@ -2,11 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1f1dbf97-8429-4c35-bb4f-72eb3c02884e" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/architecture/LSTMCells.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midi_data/game/results/generated.mid" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/architecture/decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/decoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/architecture/encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/encoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/architecture/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/architecture/vrae.py" beforeDir="false" afterPath="$PROJECT_DIR$/architecture/vrae.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/midi_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/midi_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/midi_data/game/results/aug_04woodman.mid" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/midi_data/game/results/orig.mid" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,7 +37,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../VariationalRecurrentAutoEncoder" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -56,6 +59,27 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.train">
+    <configuration name="decoder" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/architecture" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/architecture/decoder.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="encoder" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -69,27 +93,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/architecture/encoder.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="midi_utils" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BC" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data/midi_utils.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -164,10 +167,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.decoder" />
         <item itemvalue="Python.torch_play" />
         <item itemvalue="Python.utils" />
         <item itemvalue="Python.encoder" />
-        <item itemvalue="Python.midi_utils" />
       </list>
     </recent_temporary>
   </component>
@@ -189,7 +192,14 @@
       <option name="project" value="LOCAL" />
       <updated>1577461277504</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Konečně se to učí, ale rekonstrukce se učí strašně pomalu a rychle konverguje k cca 333.">
+      <created>1578505960238</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1578505960238</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -208,7 +218,8 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Teď už by to mělo fungovat nevím proč to nejde." />
-    <option name="LAST_COMMIT_MESSAGE" value="Teď už by to mělo fungovat nevím proč to nejde." />
+    <MESSAGE value="Konečně se to učí, ale rekonstrukce se učí strašně pomalu a rychle konverguje k cca 333." />
+    <option name="LAST_COMMIT_MESSAGE" value="Konečně se to učí, ale rekonstrukce se učí strašně pomalu a rychle konverguje k cca 333." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
