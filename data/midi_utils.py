@@ -1,8 +1,10 @@
 import pretty_midi
 from os import listdir, rename, remove
 from os.path import isfile, join, exists
+import os
+import shutil
+import random
 import collections
-import music21
 import pypianoroll
 import numpy as np
 from music_transformer import LOWER_BOUND, UPPER_BOUND
@@ -161,15 +163,25 @@ def file_clear(self, number_of_chars):
         rename(join(self.root_folder, file), join(self.root_folder, new_name))
 
 
-def piano_roll(file_name):
-    pr = pypianoroll.parse(file_name, beat_resolution=24)
+def piano_roll(file_name, npy=False):
+    pr = None
+    if npy:
+        pr = pypianoroll.load(file_name)
+    else:
+        pr = pypianoroll.parse(file_name, beat_resolution=24)
     tracks = []
-    for track in pr.tracks:
-        if track.program > 8 or track.is_drum:
-            continue
-        tracks.append(track)
-    piano_roll = [np.zeros((SAMPLE_LENGHT, NUM_NOTES), dtype=np.uint8) for i in
-                  range(0, np.ceil(len(pr.tracks[0].pianoroll) / SAMPLE_LENGHT).astype(np.uint8))]
+    try:
+        for track in pr.tracks:
+            if track.program > 8 or track.is_drum or len(track.pianoroll) == 0:
+                continue
+            tracks.append(track)
+        if len(tracks) == 0:
+            return None
+        piano_roll = [np.zeros((SAMPLE_LENGHT, NUM_NOTES), dtype=np.uint8) for i in
+                      range(0, np.ceil(len(tracks[0].pianoroll) / SAMPLE_LENGHT).astype(np.uint8))]
+    except IndexError as e:
+        print(e)
+        print(file_name)
     for track in pr.tracks:
         if track.program > 8 or track.is_drum:
             continue
@@ -177,7 +189,7 @@ def piano_roll(file_name):
         upper_time = 96
         for num, sample_roll in enumerate(piano_roll):
             if num == len(piano_roll) - 1:
-                print()
+                pass
             pr_track = track.pianoroll[lower_time:upper_time, LOWER_BOUND:UPPER_BOUND]
             if pr_track.shape[0] != sample_roll.shape[0]:
                 help = np.copy(pr_track)
@@ -186,13 +198,10 @@ def piano_roll(file_name):
             sample_roll[pr_track > 0] = 1
             lower_time += SAMPLE_LENGHT
             upper_time += SAMPLE_LENGHT
-    last_sample = piano_roll[-1]
-    if not np.any(last_sample):
-        piano_roll.pop()
     return piano_roll
 
 
-def midi(piano_roll, file_name):
+def midi(piano_roll, file_name, npy=False):
     piano_roll_joined = piano_roll
     piano_roll_joined = None
     for pr in piano_roll:
@@ -205,12 +214,21 @@ def midi(piano_roll, file_name):
     left_missing = np.zeros((piano_roll_joined.shape[0], LOWER_BOUND))
     right_missing = np.zeros((piano_roll_joined.shape[0], MIDI_NOTE_MAX - UPPER_BOUND))
     result = np.c_[left_missing, piano_roll_joined, right_missing]
-    obj = pypianoroll.Multitrack()
+    obj = pypianoroll.Multitrack(beat_resolution=24)
     track = pypianoroll.Track(result, program=1, is_drum=False)
     obj.tracks.append(track)
     if exists(file_name):
         remove(file_name)
-    pypianoroll.write(obj, file_name)
+    if npy:
+        pypianoroll.save(file_name, obj)
+    else:
+        pypianoroll.write(obj, file_name)
+
+
+def get_random_piano_roll_sample(root_dir):
+    file_names = os.listdir(root_dir)
+    idx = random.randrange(len(file_names) - 1)
+    return piano_roll(os.path.join(root_dir, file_names[idx]))
 
 
 def debug_fce(file_name):
@@ -218,25 +236,55 @@ def debug_fce(file_name):
     for instrument in data.instruments:
         print()
 
-# midi_dir = 'C:\\My Documents\\BC\\data\\game\\orig\\'
-# target_dir = 'C:\\My Documents\\BC\\data\\game\\transposed\\'
-# file_name = '2_-_A_brave_Warrior.mid'
-# midi_transposed_dir = 'C:\\My Documents\\BC\\data\\game\\transposed\\'
-# analyzer = Analyzer(midi_dir)
-# analyzer = Analyzer(target_dir)
-# analyzer.pitch_analyze_single(file_name, note_names=False)
-# analyzer2.pitch_analyze_single('C_' + file_name, note_names=False)
-# analyzer.pitch_analyze(note_names=True) # 26 - 96
-# analyzer.time_signature_analyze()
-# analyzer.key_signature_analyze()
-# analyzer.instrument_analysis()
-# analyzer.pith_print()
-# analyzer.file_clear(4)
 
-# root_folder = 'C:\\My Documents\\BC\\data\\game\\transposed\\'
-# target_folder = 'C:\\My Documents\\BC\\data\\game\\results\\'
-# file = 'aug_04woodman.mid'
-# p_roll = piano_roll(join(root_folder, file))
-# midi(piano_roll(join(root_folder, file)), join(target_folder, file))
-# debug_fce(join(root_folder, file))
-# midi_data = pretty_midi.PrettyMIDI(join(root_folder, file))
+def split_midi(root_dir, result_dir, too_small_dir, threshold, npy=False):
+    if not os.path.isdir(root_dir):
+        raise TypeError('cesta k midi souborum neni adresar')
+    if not os.path.exists(too_small_dir):
+        os.mkdir(too_small_dir)
+    else:
+        if not os.path.isdir(too_small_dir):
+            raise TypeError('adresar pro ulozeni prilis malych souboru neni platny dir')
+    if not os.path.exists(result_dir):
+        os.mkdir(result_dir)
+    else:
+        if not os.path.isdir(result_dir):
+            raise TypeError('adresar pro ulozeni vysledku neni platny dir')
+
+    file_names = os.listdir(root_dir)
+    for file_name in file_names:
+        file = os.path.join(root_dir, file_name)
+        pr = piano_roll(file)
+        if pr is None:
+            continue
+
+        # prilis kratky song
+        if len(pr) < threshold:
+            if npy:
+                new_file_name = os.path.join(too_small_dir, 'valid_' + file_name)
+                midi(pr, new_file_name, npy=npy)
+            else:
+                shutil.copyfile(file, os.path.join(too_small_dir, file_name))
+            continue
+
+        chunks = len(pr) // threshold
+        for i in range(0, chunks):
+            chunk = pr[i * threshold:(i + 1) * threshold]
+            new_file_name = os.path.join(result_dir, 'part' + str(i) + file_name)
+            midi(chunk, new_file_name, npy=True)
+
+
+root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed'
+too_small_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\valid'
+result_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\train'
+threshold = 30
+# split_midi(root_dir, result_dir, too_small_dir, threshold, npy=True)
+# file_names = ['part0aug_Aion_Fairy_Of_The_Peace.mid', 'part1aug_Aion_Fairy_Of_The_Peace.mid',
+#              'part2aug_Aion_Fairy_Of_The_Peace.mid', 'part0aug_AT.mid', 'part1aug_AT.mid', 'part0aug_whoareyou.mid']
+# pr1 = piano_roll(os.path.join(result_dir, 'part0aug_TearoftheStars.mid'))
+# pr2 = piano_roll(os.path.join(result_dir, file_names[1]))
+# pr3 = piano_roll(os.path.join(result_dir, file_names[2]))
+# pr4 = piano_roll(os.path.join(result_dir, file_names[3]))
+# pr5 = piano_roll(os.path.join(result_dir, file_names[4]))
+# pr6 = piano_roll(os.path.join(result_dir, file_names[5]))
+# print('yes')

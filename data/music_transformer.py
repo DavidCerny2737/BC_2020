@@ -124,7 +124,7 @@ class Transformer:
         data.write(new_file_name)
 
 
-# root_folder = 'C:\\My Documents\\BC\\data\\game\\orig\\'
-# target_folder = 'C:\\My Documents\\BC\\data\\game\\transposed\\'
+# root_folder = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\orig\\'
+# target_folder = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed\\'
 # transformer = Transformer(root_folder, target_folder)
 # transformer.start_process(lower_bound=36, upper_bound=96)

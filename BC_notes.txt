@@ -6,14 +6,5 @@ BC - links:
 	magenta vrae-code:	https://github.com/tensorflow/magenta
 	varriational recurrent autoenc: https://arxiv.org/pdf/1412.6581.pdf
 BC - notes:
-	neresim time signature a posledni piano roll padduju zezdola nulami (nechci ucit sit aby generovala jenom nuly, co s tim?)
-
-	co se songama ktery se s architekturou nevejdou na gpu? nemuzu postupne posilat chunky piano rollu do 
-	modelu protoze to chce celou sekvenci v dimenzi [seq, batch, features]
-
-	neprirozenej rust zavislosti pameti? kdyz zmensim pocet parametru nebo vstupu tak to skoro nic 
-	neudela mi prijde (jako hidden size encoderu - bidirectional / 2 skoro nic neudela ale zvyseni 
-	decodetu o jednu vrstvu je katastrofalni)
-
-	kdyz v bidirectional lstm jsou concatenated hidden stavy obou siti za sebou mam dat hidden // 2
-	nebo spis udelat sum element-wise (mean?) 
+	trojnasobna cekaci doba pri pouziti data_loaderu s num_workers = 1?? a nesmyslny chyby pri nacitani dat
+	kdyz je vic nez jedna? pouzivam to dobre? nema to bejt nejak thrad-safe zajisteny?
