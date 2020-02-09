@@ -7,7 +7,7 @@ class Encoder(nn.Module):
 
     def __init__(self, hidden_size, latent_size, input_size, num_layers=2, bidirectional=True):
         super().__init__()
-        self.rnn = nn.LSTM(input_size, hidden_size, num_layers, bidirectional=bidirectional)
+        self.rnn = nn.LSTM(input_size, hidden_size, num_layers, bidirectional=bidirectional, batch_first=True)
 
         hidden_dim = hidden_size * num_layers * 2
         if bidirectional:
@@ -20,7 +20,7 @@ class Encoder(nn.Module):
     def forward(self, x):
         output, hn = self.rnn(x)
 
-        hn = torch.cat((hn[0], hn[1]), 2).transpose(0, 1).contiguous()
+        hn = torch.cat((hn[0], hn[1]), len(hn[0].shape) - 1).transpose(0, 1).contiguous()
         hn = hn.view(hn.shape[0], -1)
         hn = self.activation(hn)
 

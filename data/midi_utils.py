@@ -259,13 +259,13 @@ def split_midi(root_dir, result_dir, too_small_dir, threshold, npy=False):
             continue
 
         # prilis kratky song
-        if len(pr) < threshold:
+        '''if len(pr) < threshold:
             if npy:
                 new_file_name = os.path.join(too_small_dir, 'valid_' + file_name)
                 midi(pr, new_file_name, npy=npy)
             else:
                 shutil.copyfile(file, os.path.join(too_small_dir, file_name))
-            continue
+            continue'''
 
         chunks = len(pr) // threshold
         for i in range(0, chunks):
@@ -274,11 +274,33 @@ def split_midi(root_dir, result_dir, too_small_dir, threshold, npy=False):
             midi(chunk, new_file_name, npy=True)
 
 
+def inspect_seq_len(root_dir, threshold, npy=False):
+    file_names = os.listdir(root_dir)
+    min_seq = 10000
+    count = 0
+    for file_name in file_names:
+        try:
+            file = os.path.join(root_dir, file_name)
+            midi = piano_roll(file, npy=npy)
+            if min_seq > len(midi):
+                min_seq = len(midi)
+            if threshold > len(midi):
+                print(file_name)
+                count += 1
+        except ValueError as e:
+            print(file_name)
+            print(e)
+    print(min_seq)
+    print(count)
+    return min_seq
+
+
 root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed'
 too_small_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\valid'
 result_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\train'
-threshold = 30
+threshold = 10
 # split_midi(root_dir, result_dir, too_small_dir, threshold, npy=True)
+# inspect_seq_len(result_dir, threshold, npy=True)
 # file_names = ['part0aug_Aion_Fairy_Of_The_Peace.mid', 'part1aug_Aion_Fairy_Of_The_Peace.mid',
 #              'part2aug_Aion_Fairy_Of_The_Peace.mid', 'part0aug_AT.mid', 'part1aug_AT.mid', 'part0aug_whoareyou.mid']
 # pr1 = piano_roll(os.path.join(result_dir, 'part0aug_TearoftheStars.mid'))

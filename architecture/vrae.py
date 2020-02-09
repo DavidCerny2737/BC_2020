@@ -30,7 +30,7 @@ class VRAE(nn.Module):
     def forward(self, x):
         mean, sigma = self.encoder.forward(x)
         z = utils.reparametrize(mean, sigma)
-        output = self.decoder(z, x.shape[0])
+        output = self.decoder(z, x.shape[1])
         return output, mean, sigma
 
     def generate(self, seq_len):
