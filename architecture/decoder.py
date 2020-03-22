@@ -6,21 +6,23 @@ from LSTMCells import LSTMCells
 
 class Decoder(nn.Module):
 
-    '''def __init__(self, hidden_size, latent_size, input_size, num_layers=2):
+    def __init__(self, hidden_size, latent_size, input_size, num_layers=2, dtype=torch.float32):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.input_size = input_size
+        self.dtype = dtype
 
         self.fc = nn.Linear(latent_size, hidden_size * num_layers * 2)
-        self.activation_fc = nn.ReLU()
+        self.activation_fc = nn.SELU()
 
         self.cells = LSTMCells(input_size, hidden_size, num_layers)
+        self.cells.type(dtype)
 
         self.fc_mapping = nn.Linear(hidden_size * num_layers * 2, input_size)
-        self.activation = nn.Sigmoid()'''
+        self.activation = nn.Sigmoid()
 
-    '''def forward(self, latent, seq_length):
+    def forward(self, latent, seq_length):
         dec_hidden = self.fc(latent)
         dec_hidden = self.activation_fc(dec_hidden)
         if len(dec_hidden.shape) == 1:
@@ -33,16 +35,16 @@ class Decoder(nn.Module):
         dec_hidden = [state.contiguous() for state in dec_hidden]
         dec_hidden = tuple(dec_hidden)
 
-        outs = torch.zeros((seq_length, batch_size, self.input_size)).cuda()
+        outs = torch.zeros((seq_length, batch_size, self.input_size), dtype=self.dtype).cuda()
 
         for t in range(0, seq_length):
             # batch, input
-            fc_input = torch.cat(dec_hidden, len(dec_hidden[0].shape) - 1).reshape((batch_size, -1))
+            fc_input = torch.cat(dec_hidden, len(dec_hidden[0].shape) - 1).reshape((batch_size, -1)).clone()
             outs[t, :, :] = self.activation(self.fc_mapping(fc_input)).squeeze().clone()
             dec_hidden = self.cells(outs[t, :, :].clone(), dec_hidden)
-        return outs'''
+        return outs
 
-    def __init__(self, hidden_size, latent_size, input_size, num_layers=2, dtype=torch.float32):
+    '''def __init__(self, hidden_size, latent_size, input_size, num_layers=2, dtype=torch.float32):
         super().__init__()
         self.hidden_size = hidden_size
         self.input_size = latent_size
@@ -69,4 +71,4 @@ class Decoder(nn.Module):
             hidden = self.cells(latent[t, :, :], hidden)
             fc_input = torch.cat(hidden, len(hidden[0].shape) - 1).reshape((batch_size, -1))
             outs[t, :, :] = self.activation(self.fc_mapping(fc_input)).squeeze().clone()
-        return outs
+        return outs'''

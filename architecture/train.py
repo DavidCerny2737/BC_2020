@@ -20,17 +20,18 @@ SIGMA_PATH = 'C:\\pycharmProjects\\BC_2020\\sigma.pth'
 
 ENC_HIDDEN = 512
 LATENT_SIZE = 256
-EPOCHS = 60
-LR = 0.004
+EPOCHS = 100
+LR = 0.001
 beta_1 = 0.05
-beta_2 = 0.001
-BATCH_SIZE = 1
-STEP_LR = 3
-INPUT_SIZE = midi_utils.SAMPLE_LENGHT * midi_utils.NUM_NOTES
+beta_2 = 0.01
+BETA = 50
+BATCH_SIZE = 10
+STEP_LR = 8
+INPUT_SIZE = midi_utils.NUM_NOTES * midi_utils.SAMPLE_LENGHT
 
-MODULO_PRINT = 2
+MODULO_PRINT = 4
 DTYPE = torch.float64
-DECODER_LAYERS = 2
+DECODER_LAYERS = 3
 ENCODER_LAYERS = 2
 
 
@@ -38,18 +39,29 @@ def test_reconstruction(model, seq_length):
     pr = midi_utils.get_random_piano_roll_sample(TRAIN_FOLDER)
     midi_utils.midi(pr, os.path.join(TARGET_FOLDER, 'test.mid'), npy=False)
     pr = torch.tensor(pr, dtype=DTYPE)
-    pr = pr.reshape((pr.shape[0], 1, -1)).cuda()
+    # pr = pr.reshape((1, -1, pr.shape[2])).cuda()
+    pr = pr.reshape((1, pr.shape[0], -1)).cuda()
     pr[pr == 80] = 1
     res = model(pr)[0].squeeze()
-    res = torch.reshape(res, (seq_length, midi_utils.SAMPLE_LENGHT, midi_utils.NUM_NOTES))
+    print(res[res == 1].shape)
     res = torch.round(res).int().cpu().detach().numpy()
     midi_utils.midi(res, os.path.join(TARGET_FOLDER, 'test_res.mid'), npy=False)
 
 
+def generate_sample(model, seq_length):
+    output = model.generate(seq_length).squeeze()
+    print(output[output == 1].shape)
+    if len(output.shape) == 3:
+        output = output.permute(1, 0, 2)
+    output = torch.round(output).int().cpu().detach().numpy()
+    midi = midi_utils.midi(output, os.path.join(TARGET_FOLDER, 'generated.mid'), npy=False)
+
+
 def train_full_data(model):
     TEST_FOLDER = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\test'
-    train_data = torch.utils.data.DataLoader(MidiNumpyDataset(TEST_FOLDER, DTYPE), batch_size=BATCH_SIZE, shuffle=True)
-    #valid_data = torch.utils.data.DataLoader(MidiNumpyDataset(VALID_FOLDER, DTYPE), batch_size=BATCH_SIZE, shuffle=True)
+    #train_data = torch.utils.data.DataLoader(MidiNumpyDataset(TEST_FOLDER, DTYPE), batch_size=BATCH_SIZE, shuffle=True)
+    train_data = torch.utils.data.DataLoader(MidiNumpyDataset(TRAIN_FOLDER, DTYPE), batch_size=BATCH_SIZE, shuffle=True)
+    valid_data = torch.utils.data.DataLoader(MidiNumpyDataset(VALID_FOLDER, DTYPE), batch_size=BATCH_SIZE, shuffle=True)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, betas=(beta_1, beta_2))
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, STEP_LR, gamma=0.9)
@@ -70,12 +82,12 @@ def train_full_data(model):
             model.zero_grad()
 
             result, mean, log_sigma = model(local_batch)
-            result = result.reshape(local_batch.shape)
+            result = result.permute(1, 0, 2)
             latent_loss = -0.5 * torch.sum(1 + log_sigma - torch.pow(mean, 2) - torch.exp(log_sigma))
 
             rec_loss = -torch.sum(
                 local_batch * torch.log(1e-10 + result) + (1 - local_batch) * torch.log(1e-10 + 1 - result))
-            total_loss = latent_loss + rec_loss
+            total_loss = BETA * latent_loss + rec_loss
             total_loss.backward()
 
             train_loss[0].append(rec_loss.data.clone().cpu().detach())
@@ -147,11 +159,7 @@ def train_full_data(model):
 
     seq_length = 10
     test_reconstruction(model, seq_length)
-
-    output = model.generate(seq_length).squeeze()
-    result = torch.reshape(output, (seq_length, midi_utils.SAMPLE_LENGHT, midi_utils.NUM_NOTES))
-    result = torch.round(result).int().cpu().detach().numpy()
-    midi = midi_utils.midi(result, os.path.join(TARGET_FOLDER, 'generated.mid'), npy=False)
+    generate_sample(model, seq_length)
 
 
 def train_single(model):
@@ -160,17 +168,30 @@ def train_single(model):
 
     train_loss_mean = numpy.ndarray(shape=(EPOCHS, 3), dtype=float)
     result = None
-    filename = 'part4aug_Portal_-_Still_Alive.mid.npz'
+    filename = 'part0aug_Portal_-_Still_Alive.mid.npz'
+    # filename2 = 'part1aug_Portal_-_Still_Alive.mid.npz'
     pr = midi_utils.piano_roll(os.path.join(TRAIN_FOLDER, filename), npy=True)
     pr = torch.tensor(pr, dtype=DTYPE)
-    pr = pr.reshape((pr.shape[0], 1, -1)).cuda()
+    # pr = pr.reshape(1, -1, pr.shape[2]).cuda()
+    pr = pr.reshape(1, pr.shape[0], -1).cuda()
+
+    # pr2 = midi_utils.piano_roll(os.path.join(TRAIN_FOLDER, filename2), npy=True)
+    # pr2 = torch.tensor(pr2, dtype=DTYPE)
+    # pr2 = pr2.reshape((1, pr2.shape[0], -1)).cuda()
+
+    # pr = torch.cat((pr, pr2), 0)'''
+
     train_loss = [[], [], []]
     for i in range(0, EPOCHS):
+        # pr = midi_utils.get_random_piano_roll_sample(TRAIN_FOLDER, npy=True)
+        # pr = torch.tensor(pr, dtype=DTYPE)
+        # pr = pr.reshape((1, pr.shape[0], -1)).cuda()
+
         model.zero_grad()
 
         # result, mean, log_sigma = model(local_batch)
         result, mean, log_sigma = model(pr)
-        result = result.reshape(pr.shape)
+        result = result.permute(1, 0, 2)
         latent_loss = -0.5 * torch.sum(1 + log_sigma - torch.pow(mean, 2) - torch.exp(log_sigma))
 
         rec_loss = -torch.sum(
@@ -210,13 +231,9 @@ def train_single(model):
     ax3.title.set_text('Total loss')
     plt.show()
 
-    seq_length = 10
+    seq_length = 5
     test_reconstruction(model, seq_length)
-
-    output = model.generate(seq_length).squeeze()
-    result = torch.reshape(output, (seq_length, midi_utils.SAMPLE_LENGHT, midi_utils.NUM_NOTES))
-    result = torch.round(result).int().cpu().detach().numpy()
-    midi = midi_utils.midi(result, os.path.join(TARGET_FOLDER, 'generated.mid'), npy=False)
+    generate_sample(model, seq_length)
 
 
 if __name__ == '__main__':

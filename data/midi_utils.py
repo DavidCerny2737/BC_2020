@@ -186,7 +186,7 @@ def piano_roll(file_name, npy=False):
         if track.program > 8 or track.is_drum:
             continue
         lower_time = 0
-        upper_time = 96
+        upper_time = SAMPLE_LENGHT
         for num, sample_roll in enumerate(piano_roll):
             if num == len(piano_roll) - 1:
                 pass
@@ -205,6 +205,12 @@ def midi(piano_roll, file_name, npy=False):
     piano_roll_joined = piano_roll
     piano_roll_joined = None
     for pr in piano_roll:
+        if len(pr.shape) == 1:
+            pr = np.reshape(pr, (SAMPLE_LENGHT, NUM_NOTES))
+            '''help = np.ndarray((SAMPLE_LENGHT, NUM_NOTES), dtype=np.int)
+            for i in range(0, len(pr) // SAMPLE_LENGHT):
+                help[:, i] = pr[SAMPLE_LENGHT * i: SAMPLE_LENGHT * (i + 1)]
+            pr = help'''
         if piano_roll_joined is None:
             piano_roll_joined = pr
             continue
@@ -225,10 +231,10 @@ def midi(piano_roll, file_name, npy=False):
         pypianoroll.write(obj, file_name)
 
 
-def get_random_piano_roll_sample(root_dir):
+def get_random_piano_roll_sample(root_dir, npy=False):
     file_names = os.listdir(root_dir)
     idx = random.randrange(len(file_names) - 1)
-    return piano_roll(os.path.join(root_dir, file_names[idx]))
+    return piano_roll(os.path.join(root_dir, file_names[idx]), npy=npy)
 
 
 def debug_fce(file_name):
@@ -298,7 +304,7 @@ def inspect_seq_len(root_dir, threshold, npy=False):
 root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed'
 too_small_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\valid'
 result_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\train'
-threshold = 10
+threshold = 5
 # split_midi(root_dir, result_dir, too_small_dir, threshold, npy=True)
 # inspect_seq_len(result_dir, threshold, npy=True)
 # file_names = ['part0aug_Aion_Fairy_Of_The_Peace.mid', 'part1aug_Aion_Fairy_Of_The_Peace.mid',

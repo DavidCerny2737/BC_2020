@@ -26,7 +26,7 @@ class MidiDataset(torch.utils.data.Dataset):
         file = os.path.join(self.root_dir, file_name)
         midi_data = midi_utils.piano_roll(file)
         pr = torch.tensor(midi_data, dtype=self.dtype)
-        pr = pr.reshape((pr.shape[0], -1))
+        pr = pr.reshape(pr.shape[0], -1).cuda()
         return pr
 
 
@@ -40,12 +40,15 @@ class MidiNumpyDataset(MidiDataset):
         file_name = os.listdir(self.root_dir)[item]
         file = os.path.join(self.root_dir, file_name)
         midi_data = midi_utils.piano_roll(file, npy=True)
-        pr = torch.tensor(midi_data, dtype=self.dtype)
-        pr = pr.reshape((pr.shape[0], -1))
+        pr = torch.tensor(midi_data, dtype=self.dtype).squeeze()
+        pr = pr.reshape(pr.shape[0], -1).cuda()
         return pr
 
 
 # root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\train'
+# dataset = MidiNumpyDataset(root_dir, torch.float64)
+# midi = dataset[10]
+# print()
 # valid_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\valid'
 # inspect_seq_len(root_dir, npy=True)
 
