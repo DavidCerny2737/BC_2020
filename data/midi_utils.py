@@ -328,7 +328,7 @@ root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed'
 # root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\new\\transposed'
 too_small_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\valid'
 result_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\train'
-threshold = 10
+threshold = 5
 # a = Analyzer(root_dir)
 # a.key_signature_analyze()
 # a.time_signature_analyze()
