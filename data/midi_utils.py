@@ -93,50 +93,69 @@ class Analyzer:
         for key, value in sorted(pitch_dict.items()):
             print(key, value, "{:10.4f}".format(value / one_percent) + '%')
 
-
-def time_signature_analyze(self):
-    time_signature_dict = {}
-    midi_files = [file for file in listdir(self.root_folder) if isfile(join(self.root_folder, file))]
-    for file in midi_files:
-        try:
-            midi_data = pretty_midi.PrettyMIDI(join(self.root_folder, file))
-            time_signatures = midi_data.time_signature_changes
-
-            # spousta souboru nema definovano time_signature
-            if len(time_signatures) == 0:
-                continue
-
-            for time_signature in time_signatures:
-                str_signature = str(time_signature.numerator) + '/' + str(time_signature.denominator)
-                if str_signature in time_signature_dict:
-                    time_signature_dict[str_signature] += 1
+    def time_analyze(self):
+        time_dict = {}
+        midi_files = [file for file in listdir(self.root_folder) if isfile(join(self.root_folder, file))]
+        for file in midi_files:
+            try:
+                midi_data = pretty_midi.PrettyMIDI(join(self.root_folder, file))
+                time_end = midi_data.get_end_time()
+                if time_end in time_dict:
+                    time_dict[time_end] += 1
                 else:
-                    time_signature_dict[str_signature] = 1
-        except IOError as e:
-            print(str(e))
-            print('File: ' + file)
-    print(time_signature_dict)
+                    time_dict[time_end] = 0
+            except IOError as e:
+                print(str(e))
+                print('File: ' + file)
+        for key in sorted(time_dict):
+            print(str(key) + " : " + str(time_dict[key]))
 
 
-def key_signature_analyze(self):
-    key_signature_dict = {}
-    midi_files = [file for file in listdir(self.root_folder) if isfile(join(self.root_folder, file))]
-    for file in midi_files:
-        try:
-            midi_data = pretty_midi.PrettyMIDI(join(self.root_folder, file))
-            key_signatures = midi_data.key_signature_changes
+    def time_signature_analyze(self):
+        time_signature_dict = {}
+        midi_files = [file for file in listdir(self.root_folder) if isfile(join(self.root_folder, file))]
+        no_time_signature_files = 0
+        for file in midi_files:
+            try:
+                midi_data = pretty_midi.PrettyMIDI(join(self.root_folder, file))
+                time_signatures = midi_data.time_signature_changes
 
-            for key_signature in key_signatures:
-                signature_name = Analyzer.key_signature_translate[key_signature.key_number]
-                if signature_name in key_signature_dict:
-                    key_signature_dict[signature_name] += 1
-                else:
-                    key_signature_dict[signature_name] = 1
-        except IOError as e:
-            print(str(e))
-            print('File: ' + file)
-    print(key_signature_dict)
-    print(len(key_signature_dict))
+                # spousta souboru nema definovano time_signature
+                if len(time_signatures) == 0:
+                    no_time_signature_files += 1
+                    continue
+
+                for time_signature in time_signatures:
+                    str_signature = str(time_signature.numerator) + '/' + str(time_signature.denominator)
+                    if str_signature in time_signature_dict:
+                        time_signature_dict[str_signature] += 1
+                    else:
+                        time_signature_dict[str_signature] = 1
+            except IOError as e:
+                print(str(e))
+                print('File: ' + file)
+        print(time_signature_dict)
+        print("Bez time signature: " + str(no_time_signature_files))
+
+    def key_signature_analyze(self):
+        key_signature_dict = {}
+        midi_files = [file for file in listdir(self.root_folder) if isfile(join(self.root_folder, file))]
+        for file in midi_files:
+            try:
+                midi_data = pretty_midi.PrettyMIDI(join(self.root_folder, file))
+                key_signatures = midi_data.key_signature_changes
+
+                for key_signature in key_signatures:
+                    signature_name = Analyzer.key_signature_translate[key_signature.key_number]
+                    if signature_name in key_signature_dict:
+                        key_signature_dict[signature_name] += 1
+                    else:
+                        key_signature_dict[signature_name] = 1
+            except IOError as e:
+                print(str(e))
+                print('File: ' + file)
+        print(key_signature_dict)
+        print(len(key_signature_dict))
 
 
 def instrument_analysis(self):
@@ -260,7 +279,11 @@ def split_midi(root_dir, result_dir, too_small_dir, threshold, npy=False):
     file_names = os.listdir(root_dir)
     for file_name in file_names:
         file = os.path.join(root_dir, file_name)
-        pr = piano_roll(file)
+        try:
+            pr = piano_roll(file)
+        except Exception as e:
+            print(e)
+            continue
         if pr is None:
             continue
 
@@ -302,14 +325,18 @@ def inspect_seq_len(root_dir, threshold, npy=False):
 
 
 root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed'
+# root_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\new\\transposed'
 too_small_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\valid'
 result_dir = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\train'
-threshold = 5
+threshold = 10
+# a = Analyzer(root_dir)
+# a.key_signature_analyze()
+# a.time_signature_analyze()
 # split_midi(root_dir, result_dir, too_small_dir, threshold, npy=True)
-# inspect_seq_len(result_dir, threshold, npy=True)
+#inspect_seq_len(result_dir, threshold, npy=True)
 # file_names = ['part0aug_Aion_Fairy_Of_The_Peace.mid', 'part1aug_Aion_Fairy_Of_The_Peace.mid',
 #              'part2aug_Aion_Fairy_Of_The_Peace.mid', 'part0aug_AT.mid', 'part1aug_AT.mid', 'part0aug_whoareyou.mid']
-# pr1 = piano_roll(os.path.join(result_dir, 'part0aug_TearoftheStars.mid'))
+# pr1 = piano_roll(os.path.join(result_dir, 'part0AdventureOfLink_Bossbattle.mid.npz'), npy=True)
 # pr2 = piano_roll(os.path.join(result_dir, file_names[1]))
 # pr3 = piano_roll(os.path.join(result_dir, file_names[2]))
 # pr4 = piano_roll(os.path.join(result_dir, file_names[3]))

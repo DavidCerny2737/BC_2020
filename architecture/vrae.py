@@ -33,9 +33,9 @@ class VRAE(nn.Module):
         output = self.decoder(z, x.shape[1])
         return output, mean, sigma
 
-    def generate(self, seq_len):
+    def generate(self, seq_len, probability_red):
         z = torch.randn(self.latent_size).type(self.dtype).cuda()
-        output = self.decoder(z, seq_len)
+        output = self.decoder(z, seq_len, probability_red)
         return output
 
     def save_weights(self, decoder_file, mean_file, sigma_file):

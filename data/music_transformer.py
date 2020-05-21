@@ -22,7 +22,7 @@ def get_step_from_number(midi_number):
 def pitch_clip(data, lower_bound, upper_bound):
     try:
         for instrument in data.instruments:
-            if instrument.program > 8 or instrument.is_drum:
+            if instrument.is_drum:
                 continue
             for note in instrument.notes:
                 if note.pitch < lower_bound:
@@ -32,6 +32,18 @@ def pitch_clip(data, lower_bound, upper_bound):
     except IOError as e:
         print(e)
 
+def to_piano(data):
+    try:
+        to_remove = []
+        for instrument in data.instruments:
+            if instrument.is_drum:
+                to_remove.append(instrument)
+                continue
+            instrument.program = 1
+        for drum in to_remove:
+            data.instruments.remove(drum)
+    except IOError as e:
+        print(e)
 
 def pitch_print(score, lower_bound, upper_bound):
     result = {}
@@ -65,8 +77,14 @@ class Transformer:
                       os.path.isfile(os.path.join(self.root_folder, file))]
 
     def start_process(self, scale_transpose=True, pitch_clip_augumentation=True, lower_bound=26, upper_bound=96):
+        i = 0
         for file in self.files:
-            data = pretty_midi.PrettyMIDI(os.path.join(self.root_folder, file))
+            try:
+                data = pretty_midi.PrettyMIDI(os.path.join(self.root_folder, file))
+            except Exception as e:
+                i += 1
+                print(str(i))
+                continue
             if scale_transpose:
                 # print(score.analyze('key'))
                 self.transpose_to_c_major(data, file)
@@ -75,6 +93,7 @@ class Transformer:
                 # self.pith_print(score, lower_bound, upper_bound)
                 pitch_clip(data, lower_bound, upper_bound)
                 # self.pith_print(score, lower_bound, upper_bound)
+            to_piano(data)
             self.commit(data, file)
 
     def transpose_to_c_major(self, data, file_name):
@@ -88,13 +107,13 @@ class Transformer:
                 else:
                     step = Transformer.minors[key.tonic.name]
                 for instrument in data.instruments:
-                    if instrument.program > 8 or instrument.is_drum:
+                    if instrument.is_drum:
                         continue
                     for note in instrument.notes:
                         note.pitch += step
             elif len(key_signatures) > 1:
                 for instrument in data.instruments:
-                    if instrument.program > 8 or instrument.is_drum:
+                    if instrument.is_drum:
                         continue
                     i = 0
                     actual_step = get_step_from_number(key_signatures[i].key_number)
@@ -112,7 +131,7 @@ class Transformer:
             else:
                 step = get_step_from_number(key_signatures[0].key_number)
                 for instrument in data.instruments:
-                    if instrument.program > 8 or instrument.is_drum:
+                    if instrument.is_drum:
                         continue
                     for note in instrument.notes:
                         note.pitch += step
@@ -125,6 +144,8 @@ class Transformer:
 
 
 # root_folder = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\orig\\'
+# root_folder = 'C:\\pycharmProjects\\BC_2020\\midi_data\\new\\orig\\'
 # target_folder = 'C:\\pycharmProjects\\BC_2020\\midi_data\\game\\transposed\\'
+target_folder = 'C:\\pycharmProjects\\BC_2020\\midi_data\\new\\transposed\\'
 # transformer = Transformer(root_folder, target_folder)
 # transformer.start_process(lower_bound=36, upper_bound=96)

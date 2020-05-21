@@ -12,10 +12,19 @@ class Encoder(nn.Module):
         hidden_dim = hidden_size * num_layers * 2
         if bidirectional:
             hidden_dim *= 2
-        self.activation = nn.SELU()
+
+        init_hidden = nn.init.xavier_normal_(torch.zeros(num_layers * 2, 1,  hidden_size).cuda())
+        init_state = nn.init.xavier_normal_(torch.zeros(num_layers * 2, 1,  hidden_size).cuda())
+        self.init_hidden = nn.Parameter(init_hidden, requires_grad=True)
+        self.init_state = nn.Parameter(init_state, requires_grad=True)
+
+        self.activation = nn.Tanh()
 
         self.mean_net = nn.Linear(hidden_dim, latent_size)
+        nn.init.xavier_uniform_(self.mean_net.weight)
+
         self.sigma_net = nn.Linear(hidden_dim, latent_size)
+        nn.init.xavier_uniform_(self.sigma_net.weight)
 
     def forward(self, x):
         output, hn = self.rnn(x)
@@ -26,4 +35,5 @@ class Encoder(nn.Module):
 
         mean = self.mean_net(hn)
         logvar = self.sigma_net(hn)
+
         return mean, logvar
