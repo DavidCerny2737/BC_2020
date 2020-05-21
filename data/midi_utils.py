@@ -332,7 +332,7 @@ threshold = 10
 # a = Analyzer(root_dir)
 # a.key_signature_analyze()
 # a.time_signature_analyze()
-# split_midi(root_dir, result_dir, too_small_dir, threshold, npy=True)
+split_midi(root_dir, result_dir, too_small_dir, threshold, npy=True)
 #inspect_seq_len(result_dir, threshold, npy=True)
 # file_names = ['part0aug_Aion_Fairy_Of_The_Peace.mid', 'part1aug_Aion_Fairy_Of_The_Peace.mid',
 #              'part2aug_Aion_Fairy_Of_The_Peace.mid', 'part0aug_AT.mid', 'part1aug_AT.mid', 'part0aug_whoareyou.mid']
